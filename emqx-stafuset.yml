@@ -1,0 +1,40 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: emqx-server
+  namespace: <yuor namespace>
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project.alauda.io/name: <yuor namespace>
+      service.alauda.io/name: statefulset-emqx-server
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        project.alauda.io/name: <yuor namespace>
+        service.alauda.io/name: statefulset-emqx-server
+    spec:
+      containers:
+        - name: emqx
+          image: 'emqx/emqx:latest'
+          resources:
+            limits:
+              cpu: '1'
+              memory: 2000Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  serviceName: ''
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10
